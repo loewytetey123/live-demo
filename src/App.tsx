@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import type { CSSProperties, KeyboardEvent } from 'react'
 import styles from './App.module.css'
 
 type Danmaku = {
@@ -61,14 +61,16 @@ const initialDanmaku: Danmaku[] = [
   { id: 6, user: 'dhf100', level: 7, content: '来了' },
 ]
 
+const toAssetPath = (file: string) => `${import.meta.env.BASE_URL}${file}`
+
 const mainSeats: Seat[] = [
-  { id: 2, name: '金融王哥', tag: '1号嘉宾', avatar: '/seat-main-1.png', kind: 'main', ring: 'blue' },
-  { id: 3, name: '是菜菜子耶', tag: '2号嘉宾', avatar: '/seat-main-2.png', kind: 'main', ring: 'pink' },
+  { id: 2, name: '金融王哥', tag: '1号嘉宾', avatar: toAssetPath('seat-main-1.png'), kind: 'main', ring: 'blue' },
+  { id: 3, name: '是菜菜子耶', tag: '2号嘉宾', avatar: toAssetPath('seat-main-2.png'), kind: 'main', ring: 'pink' },
 ]
 
 const guestSeats: Seat[] = [
-  { id: 5, name: '拉比小新', tag: '3号嘉宾', avatar: '/seat-guest-3.png', kind: 'guest', ring: 'none' },
-  { id: 6, name: '林美美', tag: '4号嘉宾', avatar: '/seat-guest-4.png', kind: 'guest', ring: 'none' },
+  { id: 5, name: '拉比小新', tag: '3号嘉宾', avatar: toAssetPath('seat-guest-3.png'), kind: 'guest', ring: 'none' },
+  { id: 6, name: '林美美', tag: '4号嘉宾', avatar: toAssetPath('seat-guest-4.png'), kind: 'guest', ring: 'none' },
   { id: 7, name: '5号麦位', kind: 'mic-open', ring: 'none' },
   { id: 8, name: '6锁麦中', kind: 'locked', ring: 'none' },
 ]
@@ -122,7 +124,11 @@ function getRandomLevel() {
   return Math.floor(Math.random() * 40) + 1
 }
 
-const AUDIENCE_AVATAR_SRCS = ['/audience-1.png', '/audience-2.png', '/audience-3.png'] as const
+const AUDIENCE_AVATAR_SRCS = [
+  toAssetPath('audience-1.png'),
+  toAssetPath('audience-2.png'),
+  toAssetPath('audience-3.png'),
+] as const
 /** 从左到右轮流置顶（视觉上从后往前交叠），单位 ms */
 const AUDIENCE_ROTATE_INTERVAL_MS = 4200
 const ROOM_SUMMARY_AUTO_HIDE_MS = 25_000
@@ -333,6 +339,13 @@ function App() {
     }
   }, [])
 
+  const phoneFrameStyle: CSSProperties = {
+    backgroundImage: `linear-gradient(180deg, rgba(7, 8, 30, 0.03) 0%, rgba(7, 8, 30, 0.14) 55%, rgba(7, 8, 30, 0.28) 100%), url('${toAssetPath('room-bg.png')}')`,
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+  }
+
   return (
     <main className={styles.page}>
       {/* 演示者单独使用，不属于手机内界面 UI */}
@@ -383,7 +396,7 @@ function App() {
         </div>
       </aside>
 
-      <section className={styles.phoneFrame}>
+      <section className={styles.phoneFrame} style={phoneFrameStyle}>
         <div className={styles.statusBar}>
           <span className={styles.clock}>19:23</span>
           <span className={styles.statusIcons}>📶 5G 🔋</span>
@@ -392,7 +405,7 @@ function App() {
         <header className={styles.topBar}>
           <div className={styles.roomCard}>
             <div className={styles.avatarPlaceholder}>
-              <img className={styles.avatarImage} src="/host-avatar.png" alt="主播头像" />
+              <img className={styles.avatarImage} src={toAssetPath('host-avatar.png')} alt="主播头像" />
             </div>
             <div>
               <div className={styles.roomTitle}>晚安✨ 语...</div>
@@ -462,11 +475,11 @@ function App() {
                 >
                   {seat.kind === 'mic-open' ? (
                     <span className={styles.placeholderIcon}>
-                      <img src="/mic-icon.svg" alt="麦克风" className={styles.seatStatusIcon} />
+                      <img src={toAssetPath('mic-icon.svg')} alt="麦克风" className={styles.seatStatusIcon} />
                     </span>
                   ) : seat.kind === 'locked' ? (
                     <span className={styles.placeholderIcon}>
-                      <img src="/lock-icon.svg" alt="锁麦" className={styles.seatStatusIcon} />
+                      <img src={toAssetPath('lock-icon.svg')} alt="锁麦" className={styles.seatStatusIcon} />
                     </span>
                   ) : (
                     <span className={styles.micInnerPlaceholder}>
@@ -497,7 +510,7 @@ function App() {
           <section className={styles.aiSummaryPanel} aria-live="polite">
             <div className={styles.aiSummaryCard}>
               <p className={styles.aiSummaryTitle}>
-                <img className={styles.aiSummaryIcon} src="/ai-room-assistant-icon.svg" alt="" />
+                <img className={styles.aiSummaryIcon} src={toAssetPath('ai-room-assistant-icon.svg')} alt="" />
                 <span className={styles.aiSummaryTitleText}>AI 房间助手：</span>
                 <span className={styles.aiSummaryTitleExtra}>🎤点歌环节 ➕ 🩵 粉丝连麦 ➕ 🤦‍♀️ 真心话</span>
               </p>
@@ -509,7 +522,7 @@ function App() {
         {isAIGiftVisible && (
           <section className={styles.aiGiftPanel} aria-live="polite">
             <img
-              src="/ai-gift-banner-4x.png"
+              src={toAssetPath('ai-gift-banner-4x.png')}
               alt="AI礼物打赏提示"
               className={styles.aiGiftBannerImage}
             />
@@ -551,7 +564,7 @@ function App() {
               placeholder="说点什么..."
             />
             <button className={styles.emojiBtn} type="button" aria-label="表情">
-              <img className={styles.toolbarEmojiIcon} src="/toolbar-emoji.svg" alt="" />
+              <img className={styles.toolbarEmojiIcon} src={toAssetPath('toolbar-emoji.svg')} alt="" />
             </button>
           </div>
           <button
@@ -569,10 +582,10 @@ function App() {
             申请上麦
           </button>
           <button type="button" className={styles.giftIconBtn} aria-label="礼物">
-            <img src="/gift-icon.png" alt="" width={22} height={22} />
+            <img src={toAssetPath('gift-icon.png')} alt="" width={22} height={22} />
           </button>
           <button type="button" className={styles.moreMenuBtn} aria-label="更多">
-            <img className={styles.toolbarMoreIcon} src="/toolbar-more.svg" alt="" />
+            <img className={styles.toolbarMoreIcon} src={toAssetPath('toolbar-more.svg')} alt="" />
             <span className={styles.moreMenuBadge} />
           </button>
         </footer>
